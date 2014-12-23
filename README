@@ -1,0 +1,5 @@
+Broadcom Bluetooth utilities
+
+brcm_patchram_plus{,_h5,_usb} -- upload firmware onto Broadcom chips
+
+
