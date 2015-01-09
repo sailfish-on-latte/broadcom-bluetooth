@@ -164,6 +164,7 @@ int i2s = 0;
 int no2bytes = 0;
 int tosleep = 0;
 int baudrate = 0;
+int enable_fork = 0;
 
 struct termios termios;
 uchar buffer[1024];
@@ -396,6 +397,13 @@ parse_tosleep(char *optarg)
 	return(0);
 }
 
+int
+parse_fork(char *optarg)
+{
+	enable_fork = 1;
+	return(0);
+}
+
 void
 usage(char *argv0)
 {
@@ -438,6 +446,7 @@ usage(char *argv0)
 	printf("\t\tbefore starting patchram download. Newer chips\n");
 	printf("\t\tdo not generate these two bytes.>\n");
 	printf("\t<--tosleep=microseconds>\n");
+	printf("\t<--enable_fork it will fork the process once completed (usefull to run it in a script)>\n");
 	printf("\tuart_device_name\n");
 }
 
@@ -452,7 +461,8 @@ parse_cmd_line(int argc, char **argv)
 	PFI parse[] = { parse_patchram, parse_baudrate,
 		parse_bdaddr, parse_enable_lpm, parse_enable_hci,
 		parse_use_baudrate_for_download,
-		parse_scopcm, parse_i2s, parse_no2bytes, parse_tosleep};
+		parse_scopcm, parse_i2s, parse_no2bytes, parse_tosleep,
+		parse_fork};
 
 	while (1) {
 		int this_option_optind = optind ? optind : 1;
@@ -469,6 +479,7 @@ parse_cmd_line(int argc, char **argv)
 			{"i2s", 1, 0, 0},
 			{"no2bytes", 0, 0, 0},
 			{"tosleep", 1, 0, 0},
+			{"enable_fork", 0, 0, 0},
 			{0, 0, 0, 0}
 		};
 
@@ -744,7 +755,7 @@ proc_enable_hci()
 		fprintf(stderr, "Can't set hci protocol\n");
 		return;
 	}
-	fprintf(stderr, "Done setting line discpline\n");
+	fprintf(stderr, "Done setting line discipline\n");
 	return;
 }
 
@@ -844,6 +855,22 @@ main (int argc, char **argv)
 
 	if (enable_hci) {
 		proc_enable_hci();
+
+		if (enable_fork)
+		{
+			int pid;
+			pid = fork();
+			if (pid == -1) {
+				printf("Fails to fork (pid == %d)\n", pid);
+			}
+			else if (pid != 0) {
+				//printf("I'm the parent so exit\n");
+				exit(0);
+			}
+			else {
+				//printf("I'm the child (pid = %d) so continue to while (1)", pid);
+			}			
+		}
 
 		while (1) {
 			sleep(UINT_MAX);
