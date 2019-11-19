@@ -1,12 +1,12 @@
-Name: broadcom-bluetooth
+Name: broadcom-bluetooth-bluez5
 Summary: Broadcom Bluetooth utilities
 URL: https://code.google.com/p/broadcom-bluetooth/
 Version: 1.0
 Release: 1
 License: Apache 2.0
 Source0: %{name}-%{version}.tar.bz2
-Requires: bluez-libs
-BuildRequires: bluez-libs-devel
+Requires: bluez5-libs
+BuildRequires: bluez5-libs-devel
 
 %description
 Broadcom Bluetooth utilities
